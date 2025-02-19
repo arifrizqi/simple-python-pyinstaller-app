@@ -14,4 +14,24 @@ node {
             junit 'test-reports/results.xml'
         }
     }
+    stage('Deploy') {
+        agent {
+            docker {
+                image 'python:3.9'
+                args '-u root'
+            }
+        }
+        steps {
+            checkout scm
+            sh 'pip install pyinstaller'
+            sh 'pyinstaller --onefile sources/add2vals.py'
+            sleep time: 1, unit: 'MINUTES'
+            echo 'Pipeline has finished successfully.'
+        }
+        post {
+            success {
+                archiveArtifacts 'dist/add2vals'
+            }
+        }
+    }
 }
